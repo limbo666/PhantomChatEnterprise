@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<InvariantGlobalization>false</InvariantGlobalization>
+		<AssemblyTitle>PhantomChat</AssemblyTitle>
+		<ApplicationIcon>a_phantom_clean_light copy.ico</ApplicationIcon>
+		<Title>PhantomChatEnterprise</Title>
+		<Company>Hand Water Pump</Company>
+		<Product>PhantomChatEnetrprise</Product>
+		<Version>1.0.0.1</Version>
+		<PackageId>PhantomChatEnterprise</PackageId>
+		<Authors>Nikos Georgousis</Authors>
+		<Description>A standalone chat server</Description>
+		<Copyright>2026 Hand Water Pump</Copyright>
+		<PackageIcon>a_phantom_clean_light copy.png</PackageIcon>
+
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<PublishSingleFile>true</PublishSingleFile>
+		<SelfContained>true</SelfContained>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="a_phantom_clean_light copy.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\a_phantom_clean_light copy.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	
+	<ItemGroup>
+    <Content Update="wwwroot\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
