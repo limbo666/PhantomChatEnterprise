@@ -355,7 +355,7 @@ body {
     opacity: 0.8;
 }
 
-#wipe-btn, #sound-btn {
+#wipe-btn, #sound-btn, #theme-btn {
     background-color: transparent;
     border: 1px solid var(--border-line);
     color: var(--text-muted);
@@ -367,6 +367,66 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+    #theme-btn:hover {
+        border-color: var(--text-primary);
+        color: var(--text-primary);
+    }
+
+/* --- AMBIENT WORKSPACE TINTING (THEMES) --- */
+/* Ομαλή μετάβαση όταν αλλάζει το ambient theme */
+#chat-area {
+    transition: background 0.4s ease-in-out;
+}
+
+    /* 🟢 Matrix (Default) */
+    #chat-area[data-theme="matrix"] {
+        background: radial-gradient(circle at 85% 15%, rgba(35, 134, 54, 0.12) 0%, var(--bg-main) 60%);
+    }
+
+    /* 🔵 Cyber Ocean */
+    #chat-area[data-theme="ocean"] {
+        background: radial-gradient(circle at 85% 15%, rgba(0, 150, 255, 0.15) 0%, var(--bg-main) 60%);
+    }
+
+        #chat-area[data-theme="ocean"] #chat-header h2 {
+            border-color: #0078d4;
+            box-shadow: 0 0 15px rgba(0, 120, 212, 0.3);
+            background: linear-gradient(135deg, rgba(0, 120, 212, 0.3) 0%, rgba(22, 27, 34, 0.9) 100%);
+        }
+
+    /* 🟣 Synthwave Violet */
+    #chat-area[data-theme="violet"] {
+        background: radial-gradient(circle at 85% 15%, rgba(180, 50, 255, 0.15) 0%, var(--bg-main) 60%);
+    }
+
+        #chat-area[data-theme="violet"] #chat-header h2 {
+            border-color: #9c27b0;
+            box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+            background: linear-gradient(135deg, rgba(156, 39, 176, 0.3) 0%, rgba(22, 27, 34, 0.9) 100%);
+        }
+
+    /* 🟠 Tactical Amber */
+    #chat-area[data-theme="amber"] {
+        background: radial-gradient(circle at 85% 15%, rgba(255, 165, 0, 0.14) 0%, var(--bg-main) 60%);
+    }
+
+        #chat-area[data-theme="amber"] #chat-header h2 {
+            border-color: #d97706;
+            box-shadow: 0 0 15px rgba(217, 119, 6, 0.3);
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.3) 0%, rgba(22, 27, 34, 0.9) 100%);
+        }
+
+    /* 🔴 Crimson Alert */
+    #chat-area[data-theme="crimson"] {
+        background: radial-gradient(circle at 85% 15%, rgba(220, 38, 38, 0.15) 0%, var(--bg-main) 60%);
+    }
+
+        #chat-area[data-theme="crimson"] #chat-header h2 {
+            border-color: #dc2626;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.3) 0%, rgba(22, 27, 34, 0.9) 100%);
+        }
 
 #wipe-btn {
     border-color: transparent;
@@ -654,6 +714,56 @@ body {
         overflow-y: auto;
         min-height: 0;
     }
+
+    /* --- Invitation Card Styling --- */
+    .invite-container {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-line);
+        border-left: 4px solid var(--accent-color);
+        padding: 12px 16px;
+        margin: 8px 0;
+        border-radius: 6px;
+        text-align: left;
+        max-width: 320px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .invite-header {
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .invite-card {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 8px 14px;
+        background-color: var(--accent-color);
+        border: 1px solid var(--accent-hover);
+        border-radius: 4px;
+        color: #ffffff;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease-in-out;
+        user-select: none;
+        box-sizing: border-box;
+    }
+
+        .invite-card:hover {
+            background-color: var(--accent-hover);
+            box-shadow: 0 0 12px rgba(35, 134, 54, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .invite-card:active {
+            transform: translateY(0);
+        }
 
     /* Touch target minimums */
     #message-input, #send-btn, .channel-item {

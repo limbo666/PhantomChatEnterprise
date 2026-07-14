@@ -41,10 +41,32 @@ let activeChannelId = 'Global';
 let activeChannelIsDm = false;
 let activeChannelTarget = 'Global';
 let isCurrentGroupCreator = false;
+let currentOnlineUsers = []; // Stores online users for invitations
 
-// Sound profiles mapping
+// Sound & Theme profiles mapping
 const soundProfiles = ["off", "classic", "ping", "tick", "scifi"];
 let channelSounds = JSON.parse(localStorage.getItem('phantom_sounds')) || {};
+
+const themeProfiles = ["matrix", "ocean", "violet", "amber", "crimson"];
+let channelThemes = JSON.parse(localStorage.getItem('phantom_themes')) || {};
+
+function updateThemeUI(theme) {
+    const activeTheme = theme || "matrix";
+    const chatArea = document.getElementById("chat-area");
+    if (chatArea) chatArea.setAttribute("data-theme", activeTheme);
+
+    const themeBtn = document.getElementById("theme-btn");
+    if (themeBtn) {
+        const labels = {
+            "matrix": "\uD83C\uDFA8 Matrix",
+            "ocean": "\uD83C\uDFA8 Ocean",
+            "violet": "\uD83C\uDFA8 Violet",
+            "amber": "\uD83C\uDFA8 Amber",
+            "crimson": "\uD83C\uDFA8 Crimson"
+        };
+        themeBtn.innerText = labels[activeTheme] || "\uD83C\uDFA8 Matrix";
+    }
+}
 
 // Synthesized Multi-Profile Web Audio Engine
 function playNotificationSound(profile = "classic") {
@@ -100,14 +122,18 @@ function updateSoundButtonUI(profile) {
     const soundBtn = document.getElementById("sound-btn");
     if (!profile || profile === "off" || profile === false) {
         soundBtn.classList.remove("active");
-        soundBtn.innerText = "𔀨 Sound: OFF";
+        soundBtn.innerText = "\uD83D\uDD15 Sound: OFF";
     } else {
         soundBtn.classList.add("active");
-        const labels = { "classic": "🔔 Chime", "ping": "📡 Ping", "tick": "⏱️ Tick", "scifi": "✨ Sci-Fi" };
-        soundBtn.innerText = labels[profile] || "🔔 Chime";
+        const labels = {
+            "classic": "\uD83D\uDD14 Chime",
+            "ping": "\uD83D\uDCE1 Ping",
+            "tick": "\u23F1\uFE0F Tick",
+            "scifi": "\u2728 Sci-Fi"
+        };
+        soundBtn.innerText = labels[profile] || "\uD83D\uDD14 Chime";
     }
 }
-
 let unreadCounts = {};
 let groupMembersData = {};
 
@@ -356,8 +382,10 @@ function switchChannel(id, name, target, isDm) {
     if (li) {
         li.classList.add('active');
         const badge = li.querySelector('.badge');
-        badge.style.display = 'none';
-        badge.innerText = '0';
+        if (badge) {
+            badge.style.display = 'none';
+            badge.innerText = '0';
+        }
         unreadCounts[id] = 0;
     }
 
@@ -369,7 +397,23 @@ function switchChannel(id, name, target, isDm) {
     renderGroupMembers(id);
     connection.invoke("RequestHistory", uuid, target, activeChannelIsDm);
 
-    updateSoundButtonUI(channelSounds[id]);
+    // Update sound button UI
+    if (typeof updateSoundButtonUI === "function") {
+        updateSoundButtonUI(channelSounds[id]);
+    }
+
+    // Apply saved ambient theme for this room
+    updateThemeUI(channelThemes[id]);
+
+    // Show [+ Invite] button only when in a Group (not Global, not DMs)
+    const inviteBtn = document.getElementById("invite-user-btn");
+    if (inviteBtn) {
+        if (id !== "Global" && !id.startsWith("DM_")) {
+            inviteBtn.style.display = "inline-block";
+        } else {
+            inviteBtn.style.display = "none";
+        }
+    }
 }
 
 function leaveGroup(groupName, liElement) {
@@ -470,6 +514,7 @@ connection.on("UpdateGroupMembers", (groupName, members) => {
 
 // 4. Εδώ προσθέσαμε το κουμπί 🏷️ στους Online Χρήστες
 connection.on("UpdateActiveUsers", (users) => {
+    currentOnlineUsers = users; // Save for invite modal/prompt
     const userList = document.getElementById('online-users-list');
     userList.innerHTML = '';
     users.forEach(u => {
@@ -541,6 +586,18 @@ connection.start().then(() => {
     connection.invoke("RequestHistory", uuid, "Global", false);
 }).catch(err => console.error(err.toString()));
 
+// --- NEW: Ambient Theme Switcher ---
+document.getElementById('theme-btn').addEventListener('click', () => {
+    let current = channelThemes[activeChannelId] || "matrix";
+    let nextIdx = (themeProfiles.indexOf(current) + 1) % themeProfiles.length;
+    let nextTheme = themeProfiles[nextIdx];
+
+    channelThemes[activeChannelId] = nextTheme;
+    localStorage.setItem('phantom_themes', JSON.stringify(channelThemes));
+
+    updateThemeUI(nextTheme);
+});
+
 document.getElementById('sound-btn').addEventListener('click', () => {
     let current = channelSounds[activeChannelId] || "off";
     if (current === true) current = "classic"; // Backward compatibility
@@ -553,6 +610,64 @@ document.getElementById('sound-btn').addEventListener('click', () => {
 
     updateSoundButtonUI(nextProfile);
     if (nextProfile !== "off") playNotificationSound(nextProfile);
+});
+
+// --- NEW: Group Invitation Handlers ---
+document.getElementById('invite-user-btn').addEventListener('click', () => {
+    if (activeChannelId === "Global" || activeChannelId.startsWith("DM_")) return;
+
+    // Filter out yourself and users already in this group
+    const currentMembers = groupMembersData[activeChannelId] || [];
+    const memberUuids = currentMembers.map(m => m.uuid);
+    const availableUsers = currentOnlineUsers.filter(u => u.uuid !== uuid && !memberUuids.includes(u.uuid));
+
+    if (availableUsers.length === 0) {
+        alert("No available online users to invite to this room.");
+        return;
+    }
+
+    // Create a clean numbered list for the user to select
+    let promptText = `Select a user to invite to #${activeChannelTarget}:\n\n`;
+    availableUsers.forEach((u, idx) => {
+        promptText += `${idx + 1}. ${getDisplayName(u.uuid, u.nickname)}\n`;
+    });
+    promptText += `\nEnter number (1-${availableUsers.length}):`;
+
+    const selection = prompt(promptText);
+    if (selection !== null && selection.trim() !== "") {
+        const index = parseInt(selection.trim(), 10) - 1;
+        if (index >= 0 && index < availableUsers.length) {
+            const targetUser = availableUsers[index];
+            connection.invoke("SendGroupInvite", uuid, nickname, targetUser.uuid, activeChannelTarget);
+            alert(`Invitation sent to ${getDisplayName(targetUser.uuid, targetUser.nickname)}!`);
+        } else {
+            alert("Invalid selection.");
+        }
+    }
+});
+
+connection.on("ReceiveInvite", (senderUuid, senderNickname, groupName, unixTimestamp) => {
+    // Play sound if active
+    if (channelSounds[activeChannelId]) playNotificationSound(channelSounds[activeChannelId]);
+
+    // Create a clickable system message inside the active chat window
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "message msg-system";
+
+    const dispName = getDisplayName(senderUuid, senderNickname);
+    msgDiv.innerHTML = `<div class="invite-container">` +
+        `<div class="invite-header">📩 <strong>${dispName}</strong> invited you to join <strong>#${groupName}</strong></div>` +
+        `<button class="invite-card" onclick="attemptJoinGroup('${groupName}', '', true)">Join #${groupName}</button>` +
+        `</div>`;
+
+    const timeDiv = document.createElement("div");
+    timeDiv.className = "msg-time";
+    timeDiv.innerText = formatTime(unixTimestamp);
+    msgDiv.appendChild(timeDiv);
+
+    const messagesContainer = document.getElementById("messages");
+    messagesContainer.appendChild(msgDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 });
 
 document.getElementById('add-group-btn').addEventListener('click', () => {

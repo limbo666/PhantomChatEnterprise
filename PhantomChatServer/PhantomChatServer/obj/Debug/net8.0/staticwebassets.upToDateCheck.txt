@@ -1,4 +1,4 @@
 wwwroot\app.js
-wwwroot\index.html
 wwwroot\signalr.min.js
 wwwroot\style.css
+wwwroot\index.html

@@ -225,5 +225,15 @@ namespace PhantomChatServer.Hubs
                 else await Clients.Group(target).SendAsync("ReceiveMessage", newMsg.Id, uuid, nickname, message, target, "", unixTime);
             }
         }
+
+        // --- NEW: Group Invitation Engine ---
+        public async Task SendGroupInvite(string senderUuid, string senderNickname, string targetUuid, string groupName)
+        {
+            if (ActiveConnections.TryGetValue(targetUuid, out var targetConnectionId))
+            {
+                long unixTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                await Clients.Client(targetConnectionId).SendAsync("ReceiveInvite", senderUuid, senderNickname, groupName, unixTime);
+            }
+        }
     }
 }

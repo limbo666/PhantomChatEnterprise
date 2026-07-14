@@ -49,7 +49,7 @@
             <div class="sidebar-footer">
                 <div id="uuid-display"></div>
                 <div class="credits">
-                    <strong>PhantomChat Enterprise</strong><br>
+                    <strong>PhantomChat Enterprise v1.2</strong><br>
                     Development: Nikos Georgousis<br>
                     <span>Open Source</span>
                 </div>
@@ -61,12 +61,16 @@
                 <div class="header-left">
                     <button id="mobile-menu-btn" title="Toggle Menu">☰</button>
                     <div>
-                        <h2 id="current-channel-name"># Global</h2>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h2 id="current-channel-name"># Global</h2>
+                            <button id="invite-user-btn" title="Invite an online user to this room" style="display: none; background: transparent; border: 1px solid var(--accent-color); color: var(--accent-hover); padding: 2px 8px; font-size: 0.7rem; border-radius: 4px; cursor: pointer;">+ Invite</button>
+                        </div>
                         <div id="group-members"></div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button id="sound-btn" title="Click to cycle audio alerts for this room">🔕 Sound: OFF</button>
+                    <button id="theme-btn" title="Click to cycle ambient workspace tint for this room">🎨 Theme: Matrix</button>
+                    <button id="sound-btn" title="Click to cycle audio alerts for this room">𔀨 Sound: OFF</button>
                     <button id="group-settings-btn" title="Group Settings (Creator Only)" style="display: none; background: transparent; border: 1px solid var(--border-line); color: var(--text-muted); padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; cursor: pointer;">⚙ Settings</button>
                     <button id="wipe-btn" title="Wipe My Messages Here">Clear History</button>
                 </div>
