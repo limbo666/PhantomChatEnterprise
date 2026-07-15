@@ -10,7 +10,8 @@ Phantom Chat Enterprise bridges the gap between lightweight instant messaging an
 Enterprise Privacy & Security
 Password-Protected Chat Rooms: Users can create private, password-enforced chat rooms. Joining requires authentication, preventing unauthorized access across the network.
 
-## Group Ownership & Management: Room creators retain administrative ownership, allowing them to change room passwords or permanently delete the group and all associated messages at any time.
+## Group Ownership & Management: 
+Room creators retain administrative ownership, allowing them to change room passwords or permanently delete the group and all associated messages at any time.
 
 Confidential Direct Messaging (DMs): Support for private, one-on-one direct messaging alongside standard group channels.
 
